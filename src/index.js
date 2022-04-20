@@ -41,7 +41,6 @@ function checksTodoExists(request, response, next) {
 
   const user = users.find((user) => user.username === username);
   const isUUID = validate(id);
-  const todoFromUser = user.todos.find((todo) => todo.id === id);
 
   if (!user) {
     return response
@@ -54,6 +53,8 @@ function checksTodoExists(request, response, next) {
       .status(400)
       .json({ error: "The provided ID is not a valid UUID4." });
   }
+
+  const todoFromUser = user.todos.find((todo) => todo.id === id);
 
   if (!todoFromUser) {
     return response
@@ -68,7 +69,19 @@ function checksTodoExists(request, response, next) {
 }
 
 function findUserById(request, response, next) {
-  // Complete aqui
+  const { id } = request.params;
+
+  const user = users.find((user) => user.id === id);
+
+  if (!user) {
+    return response
+      .status(404)
+      .json({ error: "User with provided ID not found." });
+  }
+
+  request.user = user;
+
+  return next();
 }
 
 app.post("/users", (request, response) => {

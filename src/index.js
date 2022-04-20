@@ -36,7 +36,35 @@ function checksCreateTodosUserAvailability(request, response, next) {
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
+  const { username } = request.headers;
+  const { id } = request.params;
+
+  const user = users.find((user) => user.username === username);
+  const isUUID = validate(id);
+  const todoFromUser = user.todos.find((todo) => todo.id === id);
+
+  if (!user) {
+    return response
+      .status(404)
+      .json({ error: "User with provided username not found." });
+  }
+
+  if (!isUUID) {
+    return response
+      .status(400)
+      .json({ error: "The provided ID is not a valid UUID4." });
+  }
+
+  if (!todoFromUser) {
+    return response
+      .status(404)
+      .json({ error: "The provided ID not belongs to user." });
+  }
+
+  request.user = user;
+  request.todo = todoFromUser;
+
+  return next();
 }
 
 function findUserById(request, response, next) {
